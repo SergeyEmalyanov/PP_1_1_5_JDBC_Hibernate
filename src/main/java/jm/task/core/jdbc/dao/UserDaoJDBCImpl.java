@@ -12,7 +12,7 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
     private final String CREATE_TABLE = """
-            CREATE TABLE IF NOT EXISTS `databasepp`.`users` (
+            CREATE TABLE IF NOT EXISTS users (
             `id` BIGINT NOT NULL AUTO_INCREMENT,
             `name` VARCHAR(45) NULL,
             `lastname` VARCHAR(45) NULL,
