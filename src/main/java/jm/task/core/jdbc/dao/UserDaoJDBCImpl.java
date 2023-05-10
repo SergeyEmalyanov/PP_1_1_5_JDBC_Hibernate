@@ -31,21 +31,12 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-        try (Connection connection = Util.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        statement(CREATE_TABLE);
     }
 
+
     public void dropUsersTable() {
-        try (Connection connection = Util.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(DROP_TABLE)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        statement(DROP_TABLE);
     }
 
     public void saveUser(String name, String lastName, byte age) {
@@ -62,11 +53,9 @@ public class UserDaoJDBCImpl implements UserDao {
 
             } catch (SQLException e) {
                 connection.rollback();
-                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
-            System.err.println("Соединение потеряно");
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
@@ -80,11 +69,9 @@ public class UserDaoJDBCImpl implements UserDao {
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
-                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
-            System.err.println("Соединение потеряно");
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
@@ -94,8 +81,8 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> users = new ArrayList<>();
         User user;
         try (Connection connection = Util.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID);
-             ResultSet resultSet = preparedStatement.executeQuery(SELECT_ALL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 user = new User(resultSet.getString("name"), resultSet.getString("lastname"),
                         resultSet.getByte("age"));
@@ -110,9 +97,18 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void cleanUsersTable() {
         createUsersTable();
-        try (Connection connection = Util.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ALL)) {
-            preparedStatement.executeUpdate();
+        statement(DELETE_ALL);
+    }
+
+    private void statement(String action) {
+        try (Connection connection = Util.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(action)) {
+                preparedStatement.executeUpdate();
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+            }
         } catch (SQLException e) {
             throw new RuntimeException();
         }
