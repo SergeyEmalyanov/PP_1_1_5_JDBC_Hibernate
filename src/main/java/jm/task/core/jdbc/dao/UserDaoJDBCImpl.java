@@ -1,6 +1,5 @@
 package jm.task.core.jdbc.dao;
 
-import com.mysql.cj.xdevapi.InsertStatement;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
