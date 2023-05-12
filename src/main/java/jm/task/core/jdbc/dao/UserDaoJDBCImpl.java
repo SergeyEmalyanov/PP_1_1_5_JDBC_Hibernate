@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final String CREATE_TABLE = """
+    private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS users (
             `id` BIGINT NOT NULL AUTO_INCREMENT,
             `name` VARCHAR(45) NULL,
@@ -21,11 +21,11 @@ public class UserDaoJDBCImpl implements UserDao {
             UNIQUE INDEX `idusers_UNIQUE` (`id` ASC) VISIBLE)
             ENGINE = InnoDB
             DEFAULT CHARACTER SET = utf8;""";
-    private final String DROP_TABLE = "DROP TABLE IF EXISTS users";
-    private final String INSERT_INTO = "INSERT INTO users (name,lastname,age) VALUES (?,?,?)";
-    private final String DELETE_BY_ID = "DELETE FROM users WHERE id=?";
-    private final String SELECT_ALL = "SELECT * FROM users";
-    private final String DELETE_ALL = "DELETE FROM users";
+    private static final String DROP_TABLE = "DROP TABLE IF EXISTS users";
+    private static final String INSERT_INTO = "INSERT INTO users (name,lastname,age) VALUES (?,?,?)";
+    private static final String DELETE_BY_ID = "DELETE FROM users WHERE id=?";
+    private static final String SELECT_ALL = "SELECT * FROM users";
+    private static final String DELETE_ALL = "DELETE FROM users";
 
     public UserDaoJDBCImpl() {
     }
@@ -112,5 +112,16 @@ public class UserDaoJDBCImpl implements UserDao {
         } catch (SQLException e) {
             throw new RuntimeException();
         }
+    }
+
+    public static String getCreateSQL() {
+        return CREATE_TABLE;
+    }
+
+    public static String getDropSQL() {
+        return DROP_TABLE;
+    }
+    public static String getDeleteAll(){
+        return DELETE_ALL;
     }
 }
