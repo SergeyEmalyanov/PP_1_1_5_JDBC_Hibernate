@@ -113,15 +113,4 @@ public class UserDaoJDBCImpl implements UserDao {
             throw new RuntimeException();
         }
     }
-
-    public static String getCreateSQL() {
-        return CREATE_TABLE;
-    }
-
-    public static String getDropSQL() {
-        return DROP_TABLE;
-    }
-    public static String getDeleteAll(){
-        return DELETE_ALL;
-    }
 }
