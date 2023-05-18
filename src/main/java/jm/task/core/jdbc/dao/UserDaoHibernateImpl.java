@@ -5,8 +5,6 @@ import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
@@ -21,7 +19,7 @@ public class UserDaoHibernateImpl implements UserDao {
             ENGINE = InnoDB
             DEFAULT CHARACTER SET = utf8;""";
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS users";
-    private static final String DELETE_ALL = "DELETE FROM users";
+
     public UserDaoHibernateImpl() {
     }
 
@@ -76,21 +74,26 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         createUsersTable();
-        List<User> users;
         try (Session session = Util.getSessionFactory().openSession()) {
-            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-            CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
-            criteriaQuery.from(User.class);
-            users = session.createQuery(criteriaQuery).getResultList();
+            return session.createQuery("from User", User.class).list();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        sqlQuery(DELETE_ALL);
+        Transaction transaction = null;
+        try (Session session = Util.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.createQuery("delete from User").executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     private void sqlQuery(String sql) {
